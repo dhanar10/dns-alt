@@ -1,0 +1,14 @@
+[Unit]
+Description=DNS Alt
+After=network.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/bin/sh -c "echo 'udp\ntcp' | xargs -I{} iptables -t nat -I OUTPUT -p {} --dport 53 -j DNAT --to $DNS_ALT_IP:$DNS_ALT_PORT"
+ExecStop=/bin/sh -c "echo 'udp\ntcp' | xargs -I{} iptables -t nat -D OUTPUT -p {} --dport 53 -j DNAT --to $DNS_ALT_IP:$DNS_ALT_PORT"
+Environment='DNS_ALT_IP=208.67.222.222' 'DNS_ALT_PORT=443'
+Type=oneshot
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
